@@ -1,9 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
-import { ActionMeta, Field, FieldValidationMessage, Stack, TextLink } from '@grafana/ui';
+import { ActionMeta, Button, Drawer, Field, FieldValidationMessage, Stack, TextLink } from '@grafana/ui';
+import { Trans } from 'app/core/internationalization';
 import { ContactPointSelector as ContactPointSelectorDropdown } from 'app/features/alerting/unified/components/notification-policies/ContactPointSelector';
+import { GrafanaReceiverForm } from 'app/features/alerting/unified/components/receivers/form/GrafanaReceiverForm';
 import { RuleFormValues } from 'app/features/alerting/unified/types/rule-form';
 import { createRelativeUrl } from 'app/features/alerting/unified/utils/url';
 
@@ -16,6 +18,7 @@ export interface ContactPointSelectorProps {
 
 export function ContactPointSelector({ alertManager, onSelectContactPoint }: ContactPointSelectorProps) {
   const { control, watch, trigger } = useFormContext<RuleFormValues>();
+  const [showContactPointDrawer, setShowContactPointDrawer] = useState<boolean>();
 
   const contactPointInForm = watch(`contactPoints.${alertManager}.selectedContactPoint`);
 
@@ -50,6 +53,17 @@ export function ContactPointSelector({ alertManager, onSelectContactPoint }: Con
                     showRefreshButton
                     selectedContactPointName={contactPointInForm}
                   />
+                  <Button
+                    onClick={() => {
+                      setShowContactPointDrawer(true);
+                    }}
+                    type="button"
+                    icon="plus"
+                    fill="outline"
+                    variant="secondary"
+                  >
+                    <Trans i18nKey="alerting.contact-points.create">Create contact point</Trans>
+                  </Button>
                   <LinkToContactPoints />
                 </Stack>
 
@@ -70,14 +84,23 @@ export function ContactPointSelector({ alertManager, onSelectContactPoint }: Con
           />
         </Field>
       </Stack>
+      {showContactPointDrawer && (
+        <Drawer onClose={() => setShowContactPointDrawer(false)}>
+          <GrafanaReceiverForm
+            onCreate={() => {
+              setShowContactPointDrawer(false);
+            }}
+          />
+        </Drawer>
+      )}
     </Stack>
   );
 }
 function LinkToContactPoints() {
   const hrefToContactPoints = '/alerting/notifications';
   return (
-    <TextLink external href={createRelativeUrl(hrefToContactPoints)} aria-label="View or create contact points">
-      View or create contact points
+    <TextLink external href={createRelativeUrl(hrefToContactPoints)}>
+      <Trans i18nKey="alerting.contact-points.view-all">View all contact points</Trans>
     </TextLink>
   );
 }
