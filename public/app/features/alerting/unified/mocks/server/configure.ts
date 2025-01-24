@@ -21,12 +21,7 @@ import { clearPluginSettingsCache } from 'app/features/plugins/pluginSettings';
 import { AlertmanagerChoice } from 'app/plugins/datasource/alertmanager/types';
 import { FolderDTO } from 'app/types';
 import { RulerDataSourceConfig } from 'app/types/unified-alerting';
-import {
-  GrafanaPromRuleGroupDTO,
-  PromRuleGroupDTO,
-  RulerGrafanaRuleDTO,
-  RulerRuleGroupDTO,
-} from 'app/types/unified-alerting-dto';
+import { GrafanaPromRuleGroupDTO, PromRuleGroupDTO } from 'app/types/unified-alerting-dto';
 
 import { setupDataSources } from '../../testSetup/datasources';
 import { DataSourceType } from '../../utils/datasource';
