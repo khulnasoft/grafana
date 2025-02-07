@@ -47,9 +47,10 @@ import {
 import { DashboardDataLayerSet } from '../scene/DashboardDataLayerSet';
 import { DashboardScene, DashboardSceneState } from '../scene/DashboardScene';
 import { PanelTimeRange } from '../scene/PanelTimeRange';
-import { RowRepeaterBehavior } from '../scene/RowRepeaterBehavior';
 import { DashboardGridItem } from '../scene/layout-default/DashboardGridItem';
 import { DefaultGridLayoutManager } from '../scene/layout-default/DefaultGridLayoutManager';
+import { RowRepeaterBehavior } from '../scene/layout-default/RowRepeaterBehavior';
+import { isClonedKey } from '../utils/clone';
 import { dashboardSceneGraph } from '../utils/dashboardSceneGraph';
 import {
   getLibraryPanelBehavior,
@@ -174,7 +175,7 @@ function getGridLayoutItems(
           elements.push(gridItemToGridLayoutItemKind(child, isSnapshot));
         }
       } else if (child instanceof SceneGridRow) {
-        if (child.state.key!.indexOf('-clone-') > 0 && !isSnapshot) {
+        if (isClonedKey(child.state.key!) && !isSnapshot) {
           // Skip repeat rows
           continue;
         }
@@ -402,8 +403,11 @@ function getVizPanelQueries(vizPanel: VizPanel): PanelQueryKind[] {
   return queries;
 }
 
-export function getDataQueryKind(query: SceneDataQuery): string {
-  // If the query has a datasource, use the datasource type, otherwise return empty kind
+export function getDataQueryKind(query: SceneDataQuery | string): string {
+  if (typeof query === 'string') {
+    return getDefaultDataSourceRef()?.type ?? '';
+  }
+
   return query.datasource?.type ?? getDefaultDataSourceRef()?.type ?? '';
 }
 
@@ -615,19 +619,15 @@ export function getAnnotationQueryKind(annotationQuery: AnnotationQuery): string
   }
 }
 
-export function getDefaultDataSourceRef(): DataSourceRef | undefined {
+export function getDefaultDataSourceRef(): DataSourceRef {
   // we need to return the default datasource configured in the BootConfig
   const defaultDatasource = config.bootData.settings.defaultDatasource;
 
   // get default datasource type
-  const dsList = config.bootData.settings.datasources ?? {};
+  const dsList = config.bootData.settings.datasources;
   const ds = dsList[defaultDatasource];
 
-  if (ds) {
-    return { type: ds.meta.id, uid: ds.name }; // in the datasource list from bootData "id" is the type
-  }
-
-  return undefined;
+  return { type: ds.meta.id, uid: ds.name }; // in the datasource list from bootData "id" is the type
 }
 
 // Function to know if the dashboard transformed is a valid DashboardV2Spec
