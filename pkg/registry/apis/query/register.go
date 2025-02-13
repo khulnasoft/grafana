@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,6 +14,8 @@ import (
 	common "k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/spec3"
 
+	atypes "github.com/grafana/authlib/types"
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	query "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
 	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/infra/log"
@@ -38,6 +41,8 @@ type QueryAPIBuilder struct {
 	userFacingDefaultError string
 	features               featuremgmt.FeatureToggles
 
+	authzc atypes.AccessClient
+
 	tracer     tracing.Tracer
 	metrics    *queryMetrics
 	parser     *queryParser
@@ -49,6 +54,7 @@ type QueryAPIBuilder struct {
 
 func NewQueryAPIBuilder(features featuremgmt.FeatureToggles,
 	client clientapi.DataSourceClientSupplier,
+	authzc atypes.AccessClient,
 	registry query.DataSourceApiServerRegistry,
 	legacy service.LegacyDataSourceLookup,
 	registerer prometheus.Registerer,
@@ -75,6 +81,7 @@ func NewQueryAPIBuilder(features featuremgmt.FeatureToggles,
 		concurrentQueryLimit: 4,
 		log:                  log.New("query_apiserver"),
 		client:               client,
+		authzc:               authzc,
 		registry:             registry,
 		parser:               newQueryParser(reader, legacy, tracer, log.New("query_parser")),
 		metrics:              newQueryMetrics(registerer),
@@ -91,6 +98,7 @@ func NewQueryAPIBuilder(features featuremgmt.FeatureToggles,
 func RegisterAPIService(features featuremgmt.FeatureToggles,
 	apiregistration builder.APIRegistrar,
 	dataSourcesService datasources.DataSourceService,
+	authzc atypes.AccessClient,
 	pluginStore pluginstore.Store,
 	accessControl accesscontrol.AccessControl,
 	pluginClient plugins.Client,
@@ -110,6 +118,7 @@ func RegisterAPIService(features featuremgmt.FeatureToggles,
 		&CommonDataSourceClientSupplier{
 			Client: client.NewQueryClientForPluginClient(pluginClient, pCtxProvider),
 		},
+		authzc,
 		client.NewDataSourceRegistryFromStore(pluginStore, dataSourcesService),
 		legacy, registerer, tracer,
 	)
@@ -167,7 +176,30 @@ func (b *QueryAPIBuilder) GetOpenAPIDefinitions() common.GetOpenAPIDefinitions {
 }
 
 func (b *QueryAPIBuilder) GetAuthorizer() authorizer.Authorizer {
-	return nil // default is OK
+	return authorizer.AuthorizerFunc(
+		func(ctx context.Context, attr authorizer.Attributes) (authorized authorizer.Decision, reason string, err error) {
+			// FIXME: ideally we should use `attr.GetUser()`, but that does not work`
+			u, err := identity.GetRequester(ctx)
+			if err != nil {
+				return authorizer.DecisionDeny, "valid user is required", err
+			}
+			cr, err := b.authzc.Check(ctx, u, atypes.CheckRequest{
+				Verb:      attr.GetVerb(),
+				Group:     attr.GetAPIGroup(),
+				Resource:  attr.GetResource(),
+				Namespace: attr.GetNamespace(),
+			})
+
+			if err != nil {
+				return authorizer.DecisionDeny, "authorization failed", err
+			}
+
+			if cr.Allowed {
+				return authorizer.DecisionAllow, "", nil
+			} else {
+				return authorizer.DecisionDeny, "denied", nil
+			}
+		})
 }
 
 func (b *QueryAPIBuilder) PostProcessOpenAPI(oas *spec3.OpenAPI) (*spec3.OpenAPI, error) {
