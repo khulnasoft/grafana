@@ -179,7 +179,7 @@ func (b *QueryAPIBuilder) GetAuthorizer() authorizer.Authorizer {
 	return authorizer.AuthorizerFunc(
 		func(ctx context.Context, attr authorizer.Attributes) (authorized authorizer.Decision, reason string, err error) {
 			// FIXME: ideally we should use `attr.GetUser()`, but that does not work`
-			u, err := identity.GetRequester(ctx)
+			u, ok := claims.AuthInfoFrom(ctx)
 			if err != nil {
 				return authorizer.DecisionDeny, "valid user is required", err
 			}
