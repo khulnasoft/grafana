@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/prometheus/client_golang/prometheus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,8 +15,7 @@ import (
 	common "k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/spec3"
 
-	atypes "github.com/grafana/authlib/types"
-	"github.com/grafana/grafana/pkg/apimachinery/identity"
+	claims "github.com/grafana/authlib/types"
 	query "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
 	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/infra/log"
@@ -41,7 +41,7 @@ type QueryAPIBuilder struct {
 	userFacingDefaultError string
 	features               featuremgmt.FeatureToggles
 
-	authzc atypes.AccessClient
+	authzc claims.AccessClient
 
 	tracer     tracing.Tracer
 	metrics    *queryMetrics
@@ -54,7 +54,7 @@ type QueryAPIBuilder struct {
 
 func NewQueryAPIBuilder(features featuremgmt.FeatureToggles,
 	client clientapi.DataSourceClientSupplier,
-	authzc atypes.AccessClient,
+	authzc claims.AccessClient,
 	registry query.DataSourceApiServerRegistry,
 	legacy service.LegacyDataSourceLookup,
 	registerer prometheus.Registerer,
@@ -98,7 +98,7 @@ func NewQueryAPIBuilder(features featuremgmt.FeatureToggles,
 func RegisterAPIService(features featuremgmt.FeatureToggles,
 	apiregistration builder.APIRegistrar,
 	dataSourcesService datasources.DataSourceService,
-	authzc atypes.AccessClient,
+	authzc claims.AccessClient,
 	pluginStore pluginstore.Store,
 	accessControl accesscontrol.AccessControl,
 	pluginClient plugins.Client,
@@ -180,10 +180,11 @@ func (b *QueryAPIBuilder) GetAuthorizer() authorizer.Authorizer {
 		func(ctx context.Context, attr authorizer.Attributes) (authorized authorizer.Decision, reason string, err error) {
 			// FIXME: ideally we should use `attr.GetUser()`, but that does not work`
 			u, ok := claims.AuthInfoFrom(ctx)
-			if err != nil {
-				return authorizer.DecisionDeny, "valid user is required", err
+			if !ok {
+				return authorizer.DecisionDeny, "valid user is required", errors.New("valid user required")
 			}
-			cr, err := b.authzc.Check(ctx, u, atypes.CheckRequest{
+
+			cr, err := b.authzc.Check(ctx, u, claims.CheckRequest{
 				Verb:      attr.GetVerb(),
 				Group:     attr.GetAPIGroup(),
 				Resource:  attr.GetResource(),
