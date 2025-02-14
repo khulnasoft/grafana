@@ -12,6 +12,11 @@ import (
 	gcmTime "github.com/grafana/grafana/pkg/tsdb/cloud-monitoring/time"
 )
 
+func (timeSeriesQuery *cloudMonitoringTimeSeriesQuery) getFrameGenerator(ctx context.Context, req *backend.QueryDataRequest,
+	s *Service, dsInfo datasourceInfo, logger log.Logger) backend.FrameGenerator {
+	return func() (data.Frames, error) { return data.Frames{}, nil }
+}
+
 func (timeSeriesQuery *cloudMonitoringTimeSeriesQuery) appendGraphPeriod(req *backend.QueryDataRequest) string {
 	// GraphPeriod needs to be explicitly disabled.
 	// If not set, the default behavior is to set an automatic value
