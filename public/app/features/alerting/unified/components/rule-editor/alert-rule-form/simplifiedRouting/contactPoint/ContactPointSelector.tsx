@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
-import { ActionMeta, Button, Drawer, Field, FieldValidationMessage, Stack, TextLink } from '@grafana/ui';
+import { ActionMeta, Button, Drawer, Field, FieldValidationMessage, LinkButton, Stack } from '@grafana/ui';
 import { Trans, t } from 'app/core/internationalization';
 import { ContactPointSelector as ContactPointSelectorDropdown } from 'app/features/alerting/unified/components/notification-policies/ContactPointSelector';
 import { GrafanaReceiverForm } from 'app/features/alerting/unified/components/receivers/form/GrafanaReceiverForm';
@@ -46,7 +46,7 @@ export function ContactPointSelector({ alertManager, onSelectContactPoint }: Con
           <Controller
             render={({ field: { onChange }, fieldState: { error } }) => (
               <>
-                <Stack>
+                <Stack direction="column">
                   <ContactPointSelectorDropdown
                     selectProps={{
                       onChange: (value: SelectableValue<ContactPointWithMetadata>, _: ActionMeta) => {
@@ -58,20 +58,19 @@ export function ContactPointSelector({ alertManager, onSelectContactPoint }: Con
                     showRefreshButton
                     selectedContactPointName={contactPointInForm}
                   />
-                  {addContactPointSupported && addContactPointAllowed && (
-                    <Button
-                      onClick={() => {
-                        setShowContactPointDrawer(true);
-                      }}
-                      type="button"
-                      icon="plus"
-                      fill="outline"
-                      variant="secondary"
-                    >
-                      <Trans i18nKey="alerting.contact-points.create">Create contact point</Trans>
-                    </Button>
-                  )}
-                  <LinkToContactPoints />
+                  <Stack gap={1}>
+                    {addContactPointSupported && addContactPointAllowed && (
+                      <Button
+                        onClick={() => setShowContactPointDrawer(true)}
+                        type="button"
+                        icon="plus"
+                        variant="secondary"
+                      >
+                        <Trans i18nKey="alerting.contact-points.create">Create contact point</Trans>
+                      </Button>
+                    )}
+                    <LinkToContactPoints />
+                  </Stack>
                 </Stack>
 
                 {/* Error can come from the required validation we have in here, or from the manual setError we do in the parent component.
@@ -107,8 +106,15 @@ export function ContactPointSelector({ alertManager, onSelectContactPoint }: Con
 function LinkToContactPoints() {
   const hrefToContactPoints = '/alerting/notifications';
   return (
-    <TextLink external href={createRelativeUrl(hrefToContactPoints, { alertmanager: 'grafana' })}>
+    <LinkButton
+      target="_blank"
+      rel="noreferrer"
+      icon="external-link-alt"
+      fill="outline"
+      href={createRelativeUrl(hrefToContactPoints, { alertmanager: 'grafana' })}
+      variant="secondary"
+    >
       <Trans i18nKey="alerting.contact-points.view-all">View all contact points</Trans>
-    </TextLink>
+    </LinkButton>
   );
 }
