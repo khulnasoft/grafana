@@ -960,6 +960,6 @@ const (
 	FlagNewShareReportDrawer = "newShareReportDrawer"
 
 	// FlagAssetSriChecks
-	// Enables SRI checks for grafana javascript assets
+	// Enables SRI checks for Grafana Javascript assets
 	FlagAssetSriChecks = "assetSriChecks"
 )
