@@ -1466,7 +1466,7 @@ var (
 		},
 		{
 			Name:        "prometheusUsesCombobox",
-			Description: "Use new combobox component for Prometheus query editor",
+			Description: "Use new **Combobox** component for Prometheus query editor",
 			Stage:       FeatureStageGeneralAvailability,
 			Owner:       grafanaOSSBigTent,
 			Expression:  "true", // enabled by default
@@ -1667,7 +1667,7 @@ var (
 		},
 		{
 			Name:         "templateVariablesUsesCombobox",
-			Description:  "Use new combobox component for template variables",
+			Description:  "Use new **Combobox** component for template variables",
 			Stage:        FeatureStageExperimental,
 			Owner:        grafanaFrontendPlatformSquad,
 			FrontendOnly: true,
