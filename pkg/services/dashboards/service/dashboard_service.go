@@ -1516,7 +1516,7 @@ func (dr *DashboardServiceImpl) getDashboardThroughK8s(ctx context.Context, quer
 		latestSub = "latest"
 	}
 	// The DTO subresource is required in order to return a rehydrated large object.
-	if dr.features.IsEnabledGlobally(featuremgmt.FlagUnifiedStorageBigObjectsSupport) {
+	if dr.features.IsEnabledGlobally(featuremgmt.FlagUnifiedStorageBigObjectsSupport) && query.IncludeDTO {
 		dtoSub = "dto"
 	}
 
