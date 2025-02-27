@@ -16,8 +16,15 @@ manifest: {
 			current:    "v0alpha1"
 
 			codegen: {
-				frontend: true
-				backend:  true
+				ts: {
+					enabled: true
+					config: {
+						enumsAsUnionTypes: true
+					}
+				}
+				go: {
+					enabled: true
+				}
 			}
 
 			versions: {

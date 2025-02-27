@@ -1,6 +1,8 @@
 package v0alpha1
 
 import (
+	"errors"
+
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	klog "k8s.io/klog/v2"
 
@@ -32,4 +34,8 @@ func Convert_v0alpha1_Unstructured_To_dashboard_DashboardSpec(in *common.Unstruc
 	}
 	out.Title = t
 	return nil
+}
+
+func Convert_v0alpha1_Dashboard_To_dashboard_Dashboard(in *Dashboard, out *dashboard.Dashboard, s conversion.Scope) error {
+	return errors.New("not implemented")
 }

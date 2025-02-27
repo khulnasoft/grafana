@@ -1,212 +1,33 @@
 // Code generated - EDITING IS FUTILE. DO NOT EDIT.
 
-// "Off" for no shared crosshair or tooltip (default).
-// "Crosshair" for shared crosshair.
-// "Tooltip" for shared crosshair AND shared tooltip.
-export enum DashboardCursorSync {
-	Off = "Off",
-	Crosshair = "Crosshair",
-	Tooltip = "Tooltip",
+export interface AnnotationQueryKind {
+	kind: "AnnotationQuery";
+	spec: AnnotationQuerySpec;
 }
 
-export const defaultDashboardCursorSync = (): DashboardCursorSync => (DashboardCursorSync.Off);
-
-// Links with references to other dashboards or external resources
-export interface DashboardLink {
-	// Title to display with the link
-	title: string;
-	// Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
-	// FIXME: The type is generated as `type: DashboardLinkType | dashboardLinkType.Link;` but it should be `type: DashboardLinkType`
-	type: DashboardLinkType;
-	// Icon name to be displayed with the link
-	icon: string;
-	// Tooltip to display when the user hovers their mouse over it
-	tooltip: string;
-	// Link URL. Only required/valid if the type is link
-	url?: string;
-	// List of tags to limit the linked dashboards. If empty, all dashboards will be displayed. Only valid if the type is dashboards
-	tags: string[];
-	// If true, all dashboards links will be displayed in a dropdown. If false, all dashboards links will be displayed side by side. Only valid if the type is dashboards
-	asDropdown: boolean;
-	// If true, the link will be opened in a new tab
-	targetBlank: boolean;
-	// If true, includes current template variables values in the link as query params
-	includeVars: boolean;
-	// If true, includes current time range in the link as query params
-	keepTime: boolean;
-}
-
-export const defaultDashboardLink = (): DashboardLink => ({
-	title: "",
-	type: DashboardLinkType.Link,
-	icon: "",
-	tooltip: "",
-	tags: [],
-	asDropdown: false,
-	targetBlank: false,
-	includeVars: false,
-	keepTime: false,
+export const defaultAnnotationQueryKind = (): AnnotationQueryKind => ({
+	kind: "AnnotationQuery",
+	spec: defaultAnnotationQuerySpec(),
 });
 
-// Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
-export enum DashboardLinkType {
-	Link = "link",
-	Dashboards = "dashboards",
-}
-
-export const defaultDashboardLinkType = (): DashboardLinkType => (DashboardLinkType.Link);
-
-// Time configuration
-// It defines the default time config for the time picker, the refresh picker for the specific dashboard.
-export interface TimeSettingsSpec {
-	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
-	timezone?: string;
-	// Start time range for dashboard.
-	// Accepted values are relative time strings like "now-6h" or absolute time strings like "2020-07-10T08:00:00.000Z".
-	from: string;
-	// End time range for dashboard.
-	// Accepted values are relative time strings like "now-6h" or absolute time strings like "2020-07-10T08:00:00.000Z".
-	to: string;
-	// Refresh rate of dashboard. Represented via interval string, e.g. "5s", "1m", "1h", "1d".
-	// v1: refresh
-	autoRefresh: string;
-	// Interval options available in the refresh picker dropdown.
-	// v1: timepicker.refresh_intervals
-	autoRefreshIntervals: string[];
-	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
-	// v1: timepicker.time_options , not exposed in the UI
-	quickRanges: string[];
-	// Whether timepicker is visible or not.
-	// v1: timepicker.hidden
-	hideTimepicker: boolean;
-	// Day when the week starts. Expressed by the name of the day in lowercase, e.g. "monday".
-	weekStart: string;
-	// The month that the fiscal year starts on. 0 = January, 11 = December
-	fiscalYearStartMonth: number;
-	// Override the now time by entering a time delay. Use this option to accommodate known delays in data aggregation to avoid null values.
-	// v1: timepicker.nowDelay
-	nowDelay?: string;
-}
-
-export const defaultTimeSettingsSpec = (): TimeSettingsSpec => ({
-	timezone: "browser",
-	from: "now-6h",
-	to: "now",
-	autoRefresh: "",
-	autoRefreshIntervals: [
-"5s",
-"10s",
-"30s",
-"1m",
-"5m",
-"15m",
-"30m",
-"1h",
-"2h",
-"1d",
-],
-	quickRanges: [
-"5m",
-"15m",
-"1h",
-"6h",
-"12h",
-"24h",
-"2d",
-"7d",
-"30d",
-],
-	hideTimepicker: false,
-	weekStart: "",
-	fiscalYearStartMonth: 0,
-});
-
-export type VariableKind = QueryVariableKind | TextVariableKind | ConstantVariableKind | DatasourceVariableKind | IntervalVariableKind | CustomVariableKind | GroupByVariableKind | AdhocVariableKind;
-
-export const defaultVariableKind = (): VariableKind => (defaultQueryVariableKind());
-
-// Query variable kind
-export interface QueryVariableKind {
-	kind: "QueryVariable";
-	spec: QueryVariableSpec;
-}
-
-export const defaultQueryVariableKind = (): QueryVariableKind => ({
-	kind: "QueryVariable",
-	spec: defaultQueryVariableSpec(),
-});
-
-// Query variable specification
-export interface QueryVariableSpec {
-	name: string;
-	current: VariableOption;
-	label?: string;
-	hide: VariableHide;
-	refresh: VariableRefresh;
-	skipUrlSync: boolean;
-	description?: string;
+export interface AnnotationQuerySpec {
 	datasource?: DataSourceRef;
-	query: string | DataQueryKind;
-	regex: string;
-	sort: VariableSort;
-	definition?: string;
-	options: VariableOption[];
-	multi: boolean;
-	includeAll: boolean;
-	allValue?: string;
-	placeholder?: string;
+	query?: DataQueryKind;
+	enable: boolean;
+	hide: boolean;
+	iconColor: string;
+	name: string;
+	builtIn?: boolean;
+	filter?: AnnotationPanelFilter;
 }
 
-export const defaultQueryVariableSpec = (): QueryVariableSpec => ({
+export const defaultAnnotationQuerySpec = (): AnnotationQuerySpec => ({
+	enable: false,
+	hide: false,
+	iconColor: "",
 	name: "",
-	current: { text: "", value: "", },
-	hide: VariableHide.DontHide,
-	refresh: VariableRefresh.Never,
-	skipUrlSync: false,
-	query: "",
-	regex: "",
-	sort: VariableSort.Disabled,
-	options: [],
-	multi: false,
-	includeAll: false,
+	builtIn: false,
 });
-
-// Variable option specification
-export interface VariableOption {
-	// Whether the option is selected or not
-	selected?: boolean;
-	// Text to be displayed for the option
-	text: string | string[];
-	// Value of the option
-	value: string | string[];
-}
-
-export const defaultVariableOption = (): VariableOption => ({
-	text: "",
-	value: "",
-});
-
-// Determine if the variable shows on dashboard
-// Accepted values are `dontHide` (show label and value), `hideLabel` (show value only), `hideVariable` (show nothing).
-export enum VariableHide {
-	DontHide = "dontHide",
-	HideLabel = "hideLabel",
-	HideVariable = "hideVariable",
-}
-
-export const defaultVariableHide = (): VariableHide => (VariableHide.DontHide);
-
-// Options to config when to refresh a variable
-// `never`: Never refresh the variable
-// `onDashboardLoad`: Queries the data source every time the dashboard loads.
-// `onTimeRangeChanged`: Queries the data source when the dashboard time range changes.
-export enum VariableRefresh {
-	Never = "never",
-	OnDashboardLoad = "onDashboardLoad",
-	OnTimeRangeChanged = "onTimeRangeChanged",
-}
-
-export const defaultVariableRefresh = (): VariableRefresh => (VariableRefresh.Never);
 
 export interface DataSourceRef {
 	// The plugin type-id
@@ -229,306 +50,24 @@ export const defaultDataQueryKind = (): DataQueryKind => ({
 	spec: {},
 });
 
-// Sort variable options
-// Accepted values are:
-// `disabled`: No sorting
-// `alphabeticalAsc`: Alphabetical ASC
-// `alphabeticalDesc`: Alphabetical DESC
-// `numericalAsc`: Numerical ASC
-// `numericalDesc`: Numerical DESC
-// `alphabeticalCaseInsensitiveAsc`: Alphabetical Case Insensitive ASC
-// `alphabeticalCaseInsensitiveDesc`: Alphabetical Case Insensitive DESC
-// `naturalAsc`: Natural ASC
-// `naturalDesc`: Natural DESC
-// VariableSort enum with default value
-export enum VariableSort {
-	Disabled = "disabled",
-	AlphabeticalAsc = "alphabeticalAsc",
-	AlphabeticalDesc = "alphabeticalDesc",
-	NumericalAsc = "numericalAsc",
-	NumericalDesc = "numericalDesc",
-	AlphabeticalCaseInsensitiveAsc = "alphabeticalCaseInsensitiveAsc",
-	AlphabeticalCaseInsensitiveDesc = "alphabeticalCaseInsensitiveDesc",
-	NaturalAsc = "naturalAsc",
-	NaturalDesc = "naturalDesc",
+export interface AnnotationPanelFilter {
+	// Should the specified panels be included or excluded
+	exclude?: boolean;
+	// Panel IDs that should be included or excluded
+	ids: number[];
 }
 
-export const defaultVariableSort = (): VariableSort => (VariableSort.Disabled);
-
-// Text variable kind
-export interface TextVariableKind {
-	kind: "TextVariable";
-	spec: TextVariableSpec;
-}
-
-export const defaultTextVariableKind = (): TextVariableKind => ({
-	kind: "TextVariable",
-	spec: defaultTextVariableSpec(),
+export const defaultAnnotationPanelFilter = (): AnnotationPanelFilter => ({
+	exclude: false,
+	ids: [],
 });
 
-// Text variable specification
-export interface TextVariableSpec {
-	name: string;
-	current: VariableOption;
-	query: string;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
+// "Off" for no shared crosshair or tooltip (default).
+// "Crosshair" for shared crosshair.
+// "Tooltip" for shared crosshair AND shared tooltip.
+export type DashboardCursorSync = "Off" | "Crosshair" | "Tooltip";
 
-export const defaultTextVariableSpec = (): TextVariableSpec => ({
-	name: "",
-	current: { text: "", value: "", },
-	query: "",
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Constant variable kind
-export interface ConstantVariableKind {
-	kind: "ConstantVariable";
-	spec: ConstantVariableSpec;
-}
-
-export const defaultConstantVariableKind = (): ConstantVariableKind => ({
-	kind: "ConstantVariable",
-	spec: defaultConstantVariableSpec(),
-});
-
-// Constant variable specification
-export interface ConstantVariableSpec {
-	name: string;
-	query: string;
-	current: VariableOption;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultConstantVariableSpec = (): ConstantVariableSpec => ({
-	name: "",
-	query: "",
-	current: { text: "", value: "", },
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Datasource variable kind
-export interface DatasourceVariableKind {
-	kind: "DatasourceVariable";
-	spec: DatasourceVariableSpec;
-}
-
-export const defaultDatasourceVariableKind = (): DatasourceVariableKind => ({
-	kind: "DatasourceVariable",
-	spec: defaultDatasourceVariableSpec(),
-});
-
-// Datasource variable specification
-export interface DatasourceVariableSpec {
-	name: string;
-	pluginId: string;
-	refresh: VariableRefresh;
-	regex: string;
-	current: VariableOption;
-	options: VariableOption[];
-	multi: boolean;
-	includeAll: boolean;
-	allValue?: string;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultDatasourceVariableSpec = (): DatasourceVariableSpec => ({
-	name: "",
-	pluginId: "",
-	refresh: VariableRefresh.Never,
-	regex: "",
-	current: { text: "", value: "", },
-	options: [],
-	multi: false,
-	includeAll: false,
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Interval variable kind
-export interface IntervalVariableKind {
-	kind: "IntervalVariable";
-	spec: IntervalVariableSpec;
-}
-
-export const defaultIntervalVariableKind = (): IntervalVariableKind => ({
-	kind: "IntervalVariable",
-	spec: defaultIntervalVariableSpec(),
-});
-
-// Interval variable specification
-export interface IntervalVariableSpec {
-	name: string;
-	query: string;
-	current: VariableOption;
-	options: VariableOption[];
-	auto: boolean;
-	auto_min: string;
-	auto_count: number;
-	refresh: VariableRefresh;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultIntervalVariableSpec = (): IntervalVariableSpec => ({
-	name: "",
-	query: "",
-	current: { text: "", value: "", },
-	options: [],
-	auto: false,
-	auto_min: "",
-	auto_count: 0,
-	refresh: VariableRefresh.Never,
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Custom variable kind
-export interface CustomVariableKind {
-	kind: "CustomVariable";
-	spec: CustomVariableSpec;
-}
-
-export const defaultCustomVariableKind = (): CustomVariableKind => ({
-	kind: "CustomVariable",
-	spec: defaultCustomVariableSpec(),
-});
-
-// Custom variable specification
-export interface CustomVariableSpec {
-	name: string;
-	query: string;
-	current: VariableOption;
-	options: VariableOption[];
-	multi: boolean;
-	includeAll: boolean;
-	allValue?: string;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultCustomVariableSpec = (): CustomVariableSpec => ({
-	name: "",
-	query: "",
-	current: defaultVariableOption(),
-	options: [],
-	multi: false,
-	includeAll: false,
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Group variable kind
-export interface GroupByVariableKind {
-	kind: "GroupByVariable";
-	spec: GroupByVariableSpec;
-}
-
-export const defaultGroupByVariableKind = (): GroupByVariableKind => ({
-	kind: "GroupByVariable",
-	spec: defaultGroupByVariableSpec(),
-});
-
-// GroupBy variable specification
-export interface GroupByVariableSpec {
-	name: string;
-	datasource?: DataSourceRef;
-	current: VariableOption;
-	options: VariableOption[];
-	multi: boolean;
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultGroupByVariableSpec = (): GroupByVariableSpec => ({
-	name: "",
-	current: { text: "", value: "", },
-	options: [],
-	multi: false,
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Adhoc variable kind
-export interface AdhocVariableKind {
-	kind: "AdhocVariable";
-	spec: AdhocVariableSpec;
-}
-
-export const defaultAdhocVariableKind = (): AdhocVariableKind => ({
-	kind: "AdhocVariable",
-	spec: defaultAdhocVariableSpec(),
-});
-
-// Adhoc variable specification
-export interface AdhocVariableSpec {
-	name: string;
-	datasource?: DataSourceRef;
-	baseFilters: AdHocFilterWithLabels[];
-	filters: AdHocFilterWithLabels[];
-	defaultKeys: MetricFindValue[];
-	label?: string;
-	hide: VariableHide;
-	skipUrlSync: boolean;
-	description?: string;
-}
-
-export const defaultAdhocVariableSpec = (): AdhocVariableSpec => ({
-	name: "",
-	baseFilters: [],
-	filters: [],
-	defaultKeys: [],
-	hide: VariableHide.DontHide,
-	skipUrlSync: false,
-});
-
-// Define the AdHocFilterWithLabels type
-export interface AdHocFilterWithLabels {
-	key: string;
-	operator: string;
-	value: string;
-	values?: string[];
-	keyLabel?: string;
-	valueLabels?: string[];
-	forceEdit?: boolean;
-	// @deprecated
-	condition?: string;
-}
-
-export const defaultAdHocFilterWithLabels = (): AdHocFilterWithLabels => ({
-	key: "",
-	operator: "",
-	value: "",
-});
-
-// Define the MetricFindValue type
-export interface MetricFindValue {
-	text: string;
-	value?: string | number;
-	group?: string;
-	expandable?: boolean;
-}
-
-export const defaultMetricFindValue = (): MetricFindValue => ({
-	text: "",
-});
+export const defaultDashboardCursorSync = (): DashboardCursorSync => ("Off");
 
 // Supported dashboard elements
 // |* more element types in the future
@@ -669,13 +208,9 @@ export const defaultMatcherConfig = (): MatcherConfig => ({
 
 // A topic is attached to DataFrame metadata in query results.
 // This specifies where the data should be used.
-export enum DataTopic {
-	Series = "series",
-	Annotations = "annotations",
-	AlertStates = "alertStates",
-}
+export type DataTopic = "series" | "annotations" | "alertStates";
 
-export const defaultDataTopic = (): DataTopic => (DataTopic.Series);
+export const defaultDataTopic = (): DataTopic => ("series");
 
 export interface QueryOptionsSpec {
 	timeFrom?: string;
@@ -884,22 +419,15 @@ export interface SpecialValueMap {
 export const defaultSpecialValueMap = (): SpecialValueMap => ({
 	type: "special",
 	options: {
-	match: SpecialValueMatch.True,
+	match: "true",
 	result: defaultValueMappingResult(),
 },
 });
 
 // Special value types supported by the `SpecialValueMap`
-export enum SpecialValueMatch {
-	True = "true",
-	False = "false",
-	Null = "null",
-	NotANumber = "nan",
-	NullAndNaN = "null+nan",
-	Empty = "empty",
-}
+export type SpecialValueMatch = "true" | "false" | "null" | "nan" | "null+nan" | "empty";
 
-export const defaultSpecialValueMatch = (): SpecialValueMatch => (SpecialValueMatch.True);
+export const defaultSpecialValueMatch = (): SpecialValueMatch => ("true");
 
 export interface ThresholdsConfig {
 	mode: ThresholdsMode;
@@ -907,16 +435,13 @@ export interface ThresholdsConfig {
 }
 
 export const defaultThresholdsConfig = (): ThresholdsConfig => ({
-	mode: ThresholdsMode.Absolute,
+	mode: "absolute",
 	steps: [],
 });
 
-export enum ThresholdsMode {
-	Absolute = "absolute",
-	Percentage = "percentage",
-}
+export type ThresholdsMode = "absolute" | "percentage";
 
-export const defaultThresholdsMode = (): ThresholdsMode => (ThresholdsMode.Absolute);
+export const defaultThresholdsMode = (): ThresholdsMode => ("absolute");
 
 export interface Threshold {
 	value: number;
@@ -939,7 +464,7 @@ export interface FieldColor {
 }
 
 export const defaultFieldColor = (): FieldColor => ({
-	mode: FieldColorModeId.Thresholds,
+	mode: "thresholds",
 });
 
 // Color mode for a field. You can specify a single color, or select a continuous (gradient) color schemes, based on a value.
@@ -960,34 +485,14 @@ export const defaultFieldColor = (): FieldColor => ({
 // `continuous-purples`: Continuous Purple palette mode
 // `shades`: Shades of a single color. Specify a single color, useful in an override rule.
 // `fixed`: Fixed color mode. Specify a single color, useful in an override rule.
-export enum FieldColorModeId {
-	Thresholds = "thresholds",
-	PaletteClassic = "palette-classic",
-	PaletteClassicByName = "palette-classic-by-name",
-	ContinuousGrYlRd = "continuous-GrYlRd",
-	ContinuousRdYlGr = "continuous-RdYlGr",
-	ContinuousBlYlRd = "continuous-BlYlRd",
-	ContinuousYlRd = "continuous-YlRd",
-	ContinuousBlPu = "continuous-BlPu",
-	ContinuousYlBl = "continuous-YlBl",
-	ContinuousBlues = "continuous-blues",
-	ContinuousReds = "continuous-reds",
-	ContinuousGreens = "continuous-greens",
-	ContinuousPurples = "continuous-purples",
-	Fixed = "fixed",
-	Shades = "shades",
-}
+export type FieldColorModeId = "thresholds" | "palette-classic" | "palette-classic-by-name" | "continuous-GrYlRd" | "continuous-RdYlGr" | "continuous-BlYlRd" | "continuous-YlRd" | "continuous-BlPu" | "continuous-YlBl" | "continuous-blues" | "continuous-reds" | "continuous-greens" | "continuous-purples" | "fixed" | "shades";
 
-export const defaultFieldColorModeId = (): FieldColorModeId => (FieldColorModeId.Thresholds);
+export const defaultFieldColorModeId = (): FieldColorModeId => ("thresholds");
 
 // Defines how to assign a series color from "by value" color schemes. For example for an aggregated data points like a timeseries, the color can be assigned by the min, max or last value.
-export enum FieldColorSeriesByMode {
-	Min = "min",
-	Max = "max",
-	Last = "last",
-}
+export type FieldColorSeriesByMode = "min" | "max" | "last";
 
-export const defaultFieldColorSeriesByMode = (): FieldColorSeriesByMode => (FieldColorSeriesByMode.Min);
+export const defaultFieldColorSeriesByMode = (): FieldColorSeriesByMode => ("min");
 
 export interface DynamicConfigValue {
 	id: string;
@@ -1008,8 +513,6 @@ export const defaultLibraryPanelKind = (): LibraryPanelKind => ({
 	spec: defaultLibraryPanelKindSpec(),
 });
 
-// Renamed to LibraryPanelKindSpec,
-// Because otherwise it conflicts with the LibraryPanel resource type.
 export interface LibraryPanelKindSpec {
 	// Panel ID for the library panel in the dashboard
 	id: number;
@@ -1037,47 +540,6 @@ export interface LibraryPanelRef {
 export const defaultLibraryPanelRef = (): LibraryPanelRef => ({
 	name: "",
 	uid: "",
-});
-
-export interface AnnotationQueryKind {
-	kind: "AnnotationQuery";
-	spec: AnnotationQuerySpec;
-}
-
-export const defaultAnnotationQueryKind = (): AnnotationQueryKind => ({
-	kind: "AnnotationQuery",
-	spec: defaultAnnotationQuerySpec(),
-});
-
-export interface AnnotationQuerySpec {
-	datasource?: DataSourceRef;
-	query?: DataQueryKind;
-	enable: boolean;
-	hide: boolean;
-	iconColor: string;
-	name: string;
-	builtIn?: boolean;
-	filter?: AnnotationPanelFilter;
-}
-
-export const defaultAnnotationQuerySpec = (): AnnotationQuerySpec => ({
-	enable: false,
-	hide: false,
-	iconColor: "",
-	name: "",
-	builtIn: false,
-});
-
-export interface AnnotationPanelFilter {
-	// Should the specified panels be included or excluded
-	exclude?: boolean;
-	// Panel IDs that should be included or excluded
-	ids: number[];
-}
-
-export const defaultAnnotationPanelFilter = (): AnnotationPanelFilter => ({
-	exclude: false,
-	ids: [],
 });
 
 export interface GridLayoutKind {
@@ -1187,50 +649,645 @@ export const defaultRowRepeatOptions = (): RowRepeatOptions => ({
 	value: "",
 });
 
+export interface RowsLayoutKind {
+	kind: "RowsLayout";
+	spec: RowsLayoutSpec;
+}
+
+export const defaultRowsLayoutKind = (): RowsLayoutKind => ({
+	kind: "RowsLayout",
+	spec: defaultRowsLayoutSpec(),
+});
+
+export interface RowsLayoutSpec {
+	rows: RowsLayoutRowKind[];
+}
+
+export const defaultRowsLayoutSpec = (): RowsLayoutSpec => ({
+	rows: [],
+});
+
+export interface RowsLayoutRowKind {
+	kind: "RowsLayoutRow";
+	spec: RowsLayoutRowSpec;
+}
+
+export const defaultRowsLayoutRowKind = (): RowsLayoutRowKind => ({
+	kind: "RowsLayoutRow",
+	spec: defaultRowsLayoutRowSpec(),
+});
+
+export interface RowsLayoutRowSpec {
+	title?: string;
+	collapsed: boolean;
+	repeat?: RowRepeatOptions;
+	layout: GridLayoutKind | ResponsiveGridLayoutKind | TabsLayoutKind;
+}
+
+export const defaultRowsLayoutRowSpec = (): RowsLayoutRowSpec => ({
+	collapsed: false,
+	layout: defaultGridLayoutKind(),
+});
+
+export interface ResponsiveGridLayoutKind {
+	kind: "ResponsiveGridLayout";
+	spec: ResponsiveGridLayoutSpec;
+}
+
+export const defaultResponsiveGridLayoutKind = (): ResponsiveGridLayoutKind => ({
+	kind: "ResponsiveGridLayout",
+	spec: defaultResponsiveGridLayoutSpec(),
+});
+
+export interface ResponsiveGridLayoutSpec {
+	row: string;
+	col: string;
+	items: ResponsiveGridLayoutItemKind[];
+}
+
+export const defaultResponsiveGridLayoutSpec = (): ResponsiveGridLayoutSpec => ({
+	row: "",
+	col: "",
+	items: [],
+});
+
+export interface ResponsiveGridLayoutItemKind {
+	kind: "ResponsiveGridLayoutItem";
+	spec: ResponsiveGridLayoutItemSpec;
+}
+
+export const defaultResponsiveGridLayoutItemKind = (): ResponsiveGridLayoutItemKind => ({
+	kind: "ResponsiveGridLayoutItem",
+	spec: defaultResponsiveGridLayoutItemSpec(),
+});
+
+export interface ResponsiveGridLayoutItemSpec {
+	element: ElementReference;
+}
+
+export const defaultResponsiveGridLayoutItemSpec = (): ResponsiveGridLayoutItemSpec => ({
+	element: defaultElementReference(),
+});
+
+export interface TabsLayoutKind {
+	kind: "TabsLayout";
+	spec: TabsLayoutSpec;
+}
+
+export const defaultTabsLayoutKind = (): TabsLayoutKind => ({
+	kind: "TabsLayout",
+	spec: defaultTabsLayoutSpec(),
+});
+
+export interface TabsLayoutSpec {
+	tabs: TabsLayoutTabKind[];
+}
+
+export const defaultTabsLayoutSpec = (): TabsLayoutSpec => ({
+	tabs: [],
+});
+
+export interface TabsLayoutTabKind {
+	kind: "TabsLayoutTab";
+	spec: TabsLayoutTabSpec;
+}
+
+export const defaultTabsLayoutTabKind = (): TabsLayoutTabKind => ({
+	kind: "TabsLayoutTab",
+	spec: defaultTabsLayoutTabSpec(),
+});
+
+export interface TabsLayoutTabSpec {
+	title?: string;
+	layout: GridLayoutKind | RowsLayoutKind | ResponsiveGridLayoutKind;
+}
+
+export const defaultTabsLayoutTabSpec = (): TabsLayoutTabSpec => ({
+	layout: defaultGridLayoutKind(),
+});
+
+// Links with references to other dashboards or external resources
+export interface DashboardLink {
+	// Title to display with the link
+	title: string;
+	// Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
+	// FIXME: The type is generated as `type: DashboardLinkType | dashboardLinkType.Link;` but it should be `type: DashboardLinkType`
+	type: DashboardLinkType;
+	// Icon name to be displayed with the link
+	icon: string;
+	// Tooltip to display when the user hovers their mouse over it
+	tooltip: string;
+	// Link URL. Only required/valid if the type is link
+	url?: string;
+	// List of tags to limit the linked dashboards. If empty, all dashboards will be displayed. Only valid if the type is dashboards
+	tags: string[];
+	// If true, all dashboards links will be displayed in a dropdown. If false, all dashboards links will be displayed side by side. Only valid if the type is dashboards
+	asDropdown: boolean;
+	// If true, the link will be opened in a new tab
+	targetBlank: boolean;
+	// If true, includes current template variables values in the link as query params
+	includeVars: boolean;
+	// If true, includes current time range in the link as query params
+	keepTime: boolean;
+}
+
+export const defaultDashboardLink = (): DashboardLink => ({
+	title: "",
+	type: "link",
+	icon: "",
+	tooltip: "",
+	tags: [],
+	asDropdown: false,
+	targetBlank: false,
+	includeVars: false,
+	keepTime: false,
+});
+
+// Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
+export type DashboardLinkType = "link" | "dashboards";
+
+export const defaultDashboardLinkType = (): DashboardLinkType => ("link");
+
+// Time configuration
+// It defines the default time config for the time picker, the refresh picker for the specific dashboard.
+export interface TimeSettingsSpec {
+	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
+	timezone?: string;
+	// Start time range for dashboard.
+	// Accepted values are relative time strings like "now-6h" or absolute time strings like "2020-07-10T08:00:00.000Z".
+	from: string;
+	// End time range for dashboard.
+	// Accepted values are relative time strings like "now-6h" or absolute time strings like "2020-07-10T08:00:00.000Z".
+	to: string;
+	// Refresh rate of dashboard. Represented via interval string, e.g. "5s", "1m", "1h", "1d".
+	// v1: refresh
+	autoRefresh: string;
+	// Interval options available in the refresh picker dropdown.
+	// v1: timepicker.refresh_intervals
+	autoRefreshIntervals: string[];
+	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
+	// v1: timepicker.quick_ranges , not exposed in the UI
+	quickRanges?: TimeRangeOption[];
+	// Whether timepicker is visible or not.
+	// v1: timepicker.hidden
+	hideTimepicker: boolean;
+	// Day when the week starts. Expressed by the name of the day in lowercase, e.g. "monday".
+	weekStart?: "saturday" | "monday" | "sunday";
+	// The month that the fiscal year starts on. 0 = January, 11 = December
+	fiscalYearStartMonth: number;
+	// Override the now time by entering a time delay. Use this option to accommodate known delays in data aggregation to avoid null values.
+	// v1: timepicker.nowDelay
+	nowDelay?: string;
+}
+
+export const defaultTimeSettingsSpec = (): TimeSettingsSpec => ({
+	timezone: "browser",
+	from: "now-6h",
+	to: "now",
+	autoRefresh: "",
+	autoRefreshIntervals: [
+"5s",
+"10s",
+"30s",
+"1m",
+"5m",
+"15m",
+"30m",
+"1h",
+"2h",
+"1d",
+],
+	hideTimepicker: false,
+	fiscalYearStartMonth: 0,
+});
+
+export interface TimeRangeOption {
+	display: string;
+	from: string;
+	to: string;
+}
+
+export const defaultTimeRangeOption = (): TimeRangeOption => ({
+	display: "Last 6 hours",
+	from: "now-6h",
+	to: "now",
+});
+
+export type VariableKind = QueryVariableKind | TextVariableKind | ConstantVariableKind | DatasourceVariableKind | IntervalVariableKind | CustomVariableKind | GroupByVariableKind | AdhocVariableKind;
+
+export const defaultVariableKind = (): VariableKind => (defaultQueryVariableKind());
+
+// Query variable kind
+export interface QueryVariableKind {
+	kind: "QueryVariable";
+	spec: QueryVariableSpec;
+}
+
+export const defaultQueryVariableKind = (): QueryVariableKind => ({
+	kind: "QueryVariable",
+	spec: defaultQueryVariableSpec(),
+});
+
+// Query variable specification
+export interface QueryVariableSpec {
+	name: string;
+	current: VariableOption;
+	label?: string;
+	hide: VariableHide;
+	refresh: VariableRefresh;
+	skipUrlSync: boolean;
+	description?: string;
+	datasource?: DataSourceRef;
+	query: DataQueryKind;
+	regex: string;
+	sort: VariableSort;
+	definition?: string;
+	options: VariableOption[];
+	multi: boolean;
+	includeAll: boolean;
+	allValue?: string;
+	placeholder?: string;
+}
+
+export const defaultQueryVariableSpec = (): QueryVariableSpec => ({
+	name: "",
+	current: { text: "", value: "", },
+	hide: "dontHide",
+	refresh: "never",
+	skipUrlSync: false,
+	query: defaultDataQueryKind(),
+	regex: "",
+	sort: "disabled",
+	options: [],
+	multi: false,
+	includeAll: false,
+});
+
+// Variable option specification
+export interface VariableOption {
+	// Whether the option is selected or not
+	selected?: boolean;
+	// Text to be displayed for the option
+	text: string | string[];
+	// Value of the option
+	value: string | string[];
+}
+
+export const defaultVariableOption = (): VariableOption => ({
+	text: "",
+	value: "",
+});
+
+// Determine if the variable shows on dashboard
+// Accepted values are `dontHide` (show label and value), `hideLabel` (show value only), `hideVariable` (show nothing).
+export type VariableHide = "dontHide" | "hideLabel" | "hideVariable";
+
+export const defaultVariableHide = (): VariableHide => ("dontHide");
+
+// Options to config when to refresh a variable
+// `never`: Never refresh the variable
+// `onDashboardLoad`: Queries the data source every time the dashboard loads.
+// `onTimeRangeChanged`: Queries the data source when the dashboard time range changes.
+export type VariableRefresh = "never" | "onDashboardLoad" | "onTimeRangeChanged";
+
+export const defaultVariableRefresh = (): VariableRefresh => ("never");
+
+// Sort variable options
+// Accepted values are:
+// `disabled`: No sorting
+// `alphabeticalAsc`: Alphabetical ASC
+// `alphabeticalDesc`: Alphabetical DESC
+// `numericalAsc`: Numerical ASC
+// `numericalDesc`: Numerical DESC
+// `alphabeticalCaseInsensitiveAsc`: Alphabetical Case Insensitive ASC
+// `alphabeticalCaseInsensitiveDesc`: Alphabetical Case Insensitive DESC
+// `naturalAsc`: Natural ASC
+// `naturalDesc`: Natural DESC
+// VariableSort enum with default value
+export type VariableSort = "disabled" | "alphabeticalAsc" | "alphabeticalDesc" | "numericalAsc" | "numericalDesc" | "alphabeticalCaseInsensitiveAsc" | "alphabeticalCaseInsensitiveDesc" | "naturalAsc" | "naturalDesc";
+
+export const defaultVariableSort = (): VariableSort => ("disabled");
+
+// Text variable kind
+export interface TextVariableKind {
+	kind: "TextVariable";
+	spec: TextVariableSpec;
+}
+
+export const defaultTextVariableKind = (): TextVariableKind => ({
+	kind: "TextVariable",
+	spec: defaultTextVariableSpec(),
+});
+
+// Text variable specification
+export interface TextVariableSpec {
+	name: string;
+	current: VariableOption;
+	query: string;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultTextVariableSpec = (): TextVariableSpec => ({
+	name: "",
+	current: { text: "", value: "", },
+	query: "",
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Constant variable kind
+export interface ConstantVariableKind {
+	kind: "ConstantVariable";
+	spec: ConstantVariableSpec;
+}
+
+export const defaultConstantVariableKind = (): ConstantVariableKind => ({
+	kind: "ConstantVariable",
+	spec: defaultConstantVariableSpec(),
+});
+
+// Constant variable specification
+export interface ConstantVariableSpec {
+	name: string;
+	query: string;
+	current: VariableOption;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultConstantVariableSpec = (): ConstantVariableSpec => ({
+	name: "",
+	query: "",
+	current: { text: "", value: "", },
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Datasource variable kind
+export interface DatasourceVariableKind {
+	kind: "DatasourceVariable";
+	spec: DatasourceVariableSpec;
+}
+
+export const defaultDatasourceVariableKind = (): DatasourceVariableKind => ({
+	kind: "DatasourceVariable",
+	spec: defaultDatasourceVariableSpec(),
+});
+
+// Datasource variable specification
+export interface DatasourceVariableSpec {
+	name: string;
+	pluginId: string;
+	refresh: VariableRefresh;
+	regex: string;
+	current: VariableOption;
+	options: VariableOption[];
+	multi: boolean;
+	includeAll: boolean;
+	allValue?: string;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultDatasourceVariableSpec = (): DatasourceVariableSpec => ({
+	name: "",
+	pluginId: "",
+	refresh: "never",
+	regex: "",
+	current: { text: "", value: "", },
+	options: [],
+	multi: false,
+	includeAll: false,
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Interval variable kind
+export interface IntervalVariableKind {
+	kind: "IntervalVariable";
+	spec: IntervalVariableSpec;
+}
+
+export const defaultIntervalVariableKind = (): IntervalVariableKind => ({
+	kind: "IntervalVariable",
+	spec: defaultIntervalVariableSpec(),
+});
+
+// Interval variable specification
+export interface IntervalVariableSpec {
+	name: string;
+	query: string;
+	current: VariableOption;
+	options: VariableOption[];
+	auto: boolean;
+	auto_min: string;
+	auto_count: number;
+	refresh: VariableRefresh;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultIntervalVariableSpec = (): IntervalVariableSpec => ({
+	name: "",
+	query: "",
+	current: { text: "", value: "", },
+	options: [],
+	auto: false,
+	auto_min: "",
+	auto_count: 0,
+	refresh: "never",
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Custom variable kind
+export interface CustomVariableKind {
+	kind: "CustomVariable";
+	spec: CustomVariableSpec;
+}
+
+export const defaultCustomVariableKind = (): CustomVariableKind => ({
+	kind: "CustomVariable",
+	spec: defaultCustomVariableSpec(),
+});
+
+// Custom variable specification
+export interface CustomVariableSpec {
+	name: string;
+	query: string;
+	current: VariableOption;
+	options: VariableOption[];
+	multi: boolean;
+	includeAll: boolean;
+	allValue?: string;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultCustomVariableSpec = (): CustomVariableSpec => ({
+	name: "",
+	query: "",
+	current: defaultVariableOption(),
+	options: [],
+	multi: false,
+	includeAll: false,
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Group variable kind
+export interface GroupByVariableKind {
+	kind: "GroupByVariable";
+	spec: GroupByVariableSpec;
+}
+
+export const defaultGroupByVariableKind = (): GroupByVariableKind => ({
+	kind: "GroupByVariable",
+	spec: defaultGroupByVariableSpec(),
+});
+
+// GroupBy variable specification
+export interface GroupByVariableSpec {
+	name: string;
+	datasource?: DataSourceRef;
+	current: VariableOption;
+	options: VariableOption[];
+	multi: boolean;
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultGroupByVariableSpec = (): GroupByVariableSpec => ({
+	name: "",
+	current: { text: "", value: "", },
+	options: [],
+	multi: false,
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Adhoc variable kind
+export interface AdhocVariableKind {
+	kind: "AdhocVariable";
+	spec: AdhocVariableSpec;
+}
+
+export const defaultAdhocVariableKind = (): AdhocVariableKind => ({
+	kind: "AdhocVariable",
+	spec: defaultAdhocVariableSpec(),
+});
+
+// Adhoc variable specification
+export interface AdhocVariableSpec {
+	name: string;
+	datasource?: DataSourceRef;
+	baseFilters: AdHocFilterWithLabels[];
+	filters: AdHocFilterWithLabels[];
+	defaultKeys: MetricFindValue[];
+	label?: string;
+	hide: VariableHide;
+	skipUrlSync: boolean;
+	description?: string;
+}
+
+export const defaultAdhocVariableSpec = (): AdhocVariableSpec => ({
+	name: "",
+	baseFilters: [],
+	filters: [],
+	defaultKeys: [],
+	hide: "dontHide",
+	skipUrlSync: false,
+});
+
+// Define the AdHocFilterWithLabels type
+export interface AdHocFilterWithLabels {
+	key: string;
+	operator: string;
+	value: string;
+	values?: string[];
+	keyLabel?: string;
+	valueLabels?: string[];
+	forceEdit?: boolean;
+	// @deprecated
+	condition?: string;
+}
+
+export const defaultAdHocFilterWithLabels = (): AdHocFilterWithLabels => ({
+	key: "",
+	operator: "",
+	value: "",
+});
+
+// Define the MetricFindValue type
+export interface MetricFindValue {
+	text: string;
+	value?: string | number;
+	group?: string;
+	expandable?: boolean;
+}
+
+export const defaultMetricFindValue = (): MetricFindValue => ({
+	text: "",
+});
+
 export interface Spec {
 	// Title of dashboard.
-	title: string;
-	// Description of dashboard.
-	description?: string;
+	annotations: AnnotationQueryKind[];
 	// Configuration of dashboard cursor sync behavior.
 	// "Off" for no shared crosshair or tooltip (default).
 	// "Crosshair" for shared crosshair.
 	// "Tooltip" for shared crosshair AND shared tooltip.
 	cursorSync: DashboardCursorSync;
+	// Description of dashboard.
+	description?: string;
+	// Whether a dashboard is editable or not.
+	editable?: boolean;
+	elements: Record<string, Element>;
+	layout: GridLayoutKind | RowsLayoutKind | ResponsiveGridLayoutKind | TabsLayoutKind;
+	// Links with references to other dashboards or external websites.
+	links: DashboardLink[];
 	// When set to true, the dashboard will redraw panels at an interval matching the pixel width.
 	// This will keep data "moving left" regardless of the query refresh rate. This setting helps
 	// avoid dashboards presenting stale live data.
 	liveNow?: boolean;
 	// When set to true, the dashboard will load all panels in the dashboard when it's loaded.
 	preload: boolean;
-	// Whether a dashboard is editable or not.
-	editable?: boolean;
-	// Links with references to other dashboards or external websites.
-	links: DashboardLink[];
-	// Tags associated with dashboard.
-	tags: string[];
-	timeSettings: TimeSettingsSpec;
-	// Configured template variables.
-	variables: VariableKind[];
-	elements: Record<string, Element>;
-	annotations: AnnotationQueryKind[];
-	layout: GridLayoutKind;
 	// Plugins only. The version of the dashboard installed together with the plugin.
 	// This is used to determine if the dashboard should be updated when the plugin is updated.
 	revision?: number;
+	// Tags associated with dashboard.
+	tags: string[];
+	timeSettings: TimeSettingsSpec;
+	// Title of dashboard.
+	title: string;
+	// Configured template variables.
+	variables: VariableKind[];
 }
 
 export const defaultSpec = (): Spec => ({
-	title: "",
-	cursorSync: DashboardCursorSync.Off,
-	preload: false,
+	annotations: [],
+	cursorSync: "Off",
 	editable: true,
+	elements: {},
+	layout: defaultGridLayoutKind(),
 	links: [],
+	preload: false,
 	tags: [],
 	timeSettings: defaultTimeSettingsSpec(),
+	title: "",
 	variables: [],
-	elements: {},
-	annotations: [],
-	layout: defaultGridLayoutKind(),
 });
 
